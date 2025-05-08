@@ -42,7 +42,7 @@ pico_set_program_version(imperial_march_buzzer "0.1")
 
 # Modify the below lines to enable/disable output over UART/USB
 pico_enable_stdio_uart(imperial_march_buzzer 0)
-pico_enable_stdio_usb(imperial_march_buzzer 0)
+pico_enable_stdio_usb(imperial_march_buzzer 1)
 
 # Add the standard library to the build
 target_link_libraries(imperial_march_buzzer

@@ -1,9 +1,10 @@
+#include <stdio.h>
 #include "pico/stdlib.h"
 #include "hardware/pwm.h"
 #include "pico/multicore.h"
 
 #define BUZZER_A_PIN 21
-#define BUZZER_B_PIN 22
+#define BUZZER_B_PIN 8
 
 // Frequências da escala cromática de C4 a C5 (valores arredondados)
 const float notes[] = {
@@ -101,6 +102,7 @@ void play_note(int buzzer, float note, int note_duration, int interval) {
 }
 
 void core1_entry() {
+    printf("Tocando no core 1.\n");
     while(true) {
         for(int i = 0; i < (sizeof(solo)/sizeof(solo[0])); i++) {
             play_note(BUZZER_A_PIN, solo[i], solo_duration[i], 50);
@@ -111,21 +113,19 @@ void core1_entry() {
 int main() {
     stdio_init_all();
 
+    sleep_ms(5000);
     multicore_launch_core1(core1_entry);
 
-    while(true) {
-        // Toca cada nota da escala cromática
-        for(int i = 0; i < (sizeof(chorus)/sizeof(chorus[0])); i++) {
-            play_note(BUZZER_B_PIN, chorus[i], chorus_duration[i], 50);
-        }
+    printf("Tocando no core 0\n");
+    // Toca cada nota da escala cromática
+    for(int i = 0; i < (sizeof(chorus)/sizeof(chorus[0])); i++) {
+        play_note(BUZZER_B_PIN, chorus[i], chorus_duration[i], 50);
+    }
+    
+    // Longa pausa após a escala completa
+    sleep_ms(2000);
 
-        /*
-        for(int i = 0; i < (sizeof(chorus)/sizeof(chorus[0])); i++) {
-            play_note(chorus[i], chorus_duration[i], 50);
-        }
-        */
-        
-        // Longa pausa após a escala completa
-        sleep_ms(2000);
+    while(true) {
+        tight_loop_contents();
     }
 }
